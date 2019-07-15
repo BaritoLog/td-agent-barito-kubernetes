@@ -20,15 +20,18 @@ helm repo add barito https://baritolog.github.io/helm-charts
 2. Create a custom yaml containing helm chart values to specify app that you want its logs to be forwarded, example:
 ```yaml
 # myApps.yaml
+defaultAppOptions:
+  applicationGroupSecret: abc
+  produceUrl: https://barito-router.my-domain.com/produce_batch
 apps:
   - name: my-app-1
-    applicationGroupSecret: abc
     baritoAppName: My App 1
-    produceUrl: https://barito-router.my-domain.com/produce_batch
   - name: my-app-2
-    applicationGroupSecret: def
     baritoAppName: My App 2
-    produceUrl: https://barito-router.my-domain.com/produce_batch
+  - name: my-app-3
+    baritoAppName: My App 3
+    applicationGroupSecret: xyz
+    produceUrl: https://barito-router.other-domain.com/produce_batch
 ```
 
 > `name` is metadata name of your deployment
