@@ -18,6 +18,10 @@ resources:
   requests:
     memory: 512Mi
 
+defaultAppOptions:
+  applicationGroupSecret: null
+  produceUrl: null
+
 defaultAgentOptions:
   buffer:
     flushAtShutdown: false
