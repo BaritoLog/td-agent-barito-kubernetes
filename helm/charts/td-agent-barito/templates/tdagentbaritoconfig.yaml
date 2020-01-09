@@ -26,6 +26,7 @@ data:
     <match kubernetes.var.log.containers.{{ .name }}-**.log>
       @type barito_batch_k8s
       name {{ .name }}
+      cluster_name {{ $.Values.cluster_name }}
       application_name {{ .baritoAppName }}
       {{- if .applicationGroupSecret }}
       application_group_secret {{ .applicationGroupSecret }}
