@@ -35,3 +35,5 @@ defaultAgentOptions:
     retryTimeout: 0s
     retryMaxTimes: 0
     disableChunkBackup: true
+
+useCRIFormat: false

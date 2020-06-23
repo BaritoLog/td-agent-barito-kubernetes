@@ -13,11 +13,13 @@ Sign in to BaritoMarket and find your Application Group. Barito `Application Gro
 ### Install Helm Chart
 
 1. Add our helm chart repo
+
 ```shell
 helm repo add barito https://baritolog.github.io/helm-charts
 ```
 
 2. Create a custom yaml containing helm chart values to specify app that you want its logs to be forwarded, example:
+
 ```yaml
 # myApps.yaml
 cluster_name: my-prod-cluster
@@ -33,12 +35,13 @@ apps:
     baritoAppName: My App 3
     applicationGroupSecret: xyz
     produceUrl: https://barito-router.other-domain.com/produce_batch
-    
+
 ```
 
 > `name` is metadata name of your deployment
 
 3. Install using helm
+
 ```shell
 helm install barito/td-agent-barito --name=td-agent-barito --values=myApps.yaml
 ```
@@ -47,9 +50,12 @@ Override `rbac.create` when installing: `--set rbac.create=true` if you are usin
 
 ## Notes
 
-If not specified, 
+If not specified,
+
 - DaemonSet will have memory limits of `2 Gi` and memory requests `1 Gi`. Use `--set resources.limits.memory=XX` or `--set resources.requests.memory=XX` to override.
 
 - DaemonSet will have cpu limits of `2` and cpu requests `500m`. Use `--set resources.limits.cpu=XX` or `--set resources.requests.cpu=XX` to override.
 
 - DaemonSet will have ephemeral-storage limits of `6 Gi` and ephemeral-storage requests `4 Gi`. Use `--set resources.limits.ephemeral-storage=XX` or `--set resources.requests.ephemeral-storage=XX` to override.
+
+- td-agent will has config `parse @type none` by default. Use `--set useCRIFormat=true` if the cluster use CRI-o Format.

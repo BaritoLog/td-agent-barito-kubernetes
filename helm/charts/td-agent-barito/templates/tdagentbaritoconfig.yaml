@@ -12,7 +12,14 @@ data:
       time_format %Y-%m-%dT%H:%M:%S.%NZ
       tag kubernetes.*
       <parse>
+        {{- if .Values.useCRIFormat }}
+        @type regexp
+        expression /^(?<time>.+) (?<stream>std(?:out|err)) (?<flag>[FP]) (?<log>.*)$/
+        time_key time
+        time_format %Y-%m-%dT%H:%M:%S.%N%:z
+        {{- else }}
         @type none
+        {{- end }}
       </parse>
       read_from_head true
     </source>
