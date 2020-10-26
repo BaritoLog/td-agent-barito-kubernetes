@@ -33,7 +33,10 @@ defaultAgentOptions:
     queuedChunksLimitSize: 1
     overflowAction: drop_oldest_chunk
     retryTimeout: 0s
-    retryMaxTimes: 0
+    retryMaxTimes: 3
+    retry_type: exponential_backoff
+    retry_wait: 1s
+    retry_exponential_backoff_base: 2
     disableChunkBackup: true
 
 useCRIFormat: false
