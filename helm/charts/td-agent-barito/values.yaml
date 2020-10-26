@@ -24,7 +24,7 @@ resources:
 
 defaultAgentOptions:
   buffer:
-    flushAtShutdown: false
+    flushAtShutdown: true
     flushThreadCount: 8
     flushThreadInterval: 1.0
     flushThreadBurstInterval: 1.0
