@@ -56,9 +56,9 @@ data:
         overflow_action {{ $.Values.defaultAgentOptions.buffer.overflowAction }}
         retry_timeout {{ $.Values.defaultAgentOptions.buffer.retryTimeout }}
         retry_max_times {{ $.Values.defaultAgentOptions.buffer.retryMaxTimes }}
-        retry_type {{ $.Values.defaultAgentOptions.buffer.retry_type }}
-        retry_wait {{ $.Values.defaultAgentOptions.buffer.retry_wait }}
-        retry_exponential_backoff_base {{ $.Values.defaultAgentOptions.buffer.retry_exponential_backoff_base }}
+        retry_type {{ $.Values.defaultAgentOptions.buffer.retryType }}
+        retry_wait {{ $.Values.defaultAgentOptions.buffer.retryWait }}
+        retry_exponential_backoff_base {{ $.Values.defaultAgentOptions.buffer.retryExponentialBackoffBase }}
         disable_chunk_backup {{ $.Values.defaultAgentOptions.buffer.disableChunkBackup }}
         {{- range .bufferOptions }}
         {{ . }}
