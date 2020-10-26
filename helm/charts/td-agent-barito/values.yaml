@@ -36,7 +36,7 @@ defaultAgentOptions:
     retryMaxTimes: 3
     retryType: exponential_backoff
     retryWait: 1s
-    retryExponentialBackoff_base: 2
+    retryExponentialBackoffBase: 2
     disableChunkBackup: true
 
 useCRIFormat: false
