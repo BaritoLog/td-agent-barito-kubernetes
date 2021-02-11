@@ -6,9 +6,17 @@ RUN ulimit -n 100000
 # Disable prompts from apt.
 ENV DEBIAN_FRONTEND noninteractive
 
-COPY build.sh /tmp/build.sh
-RUN ["chmod", "+x", "/tmp/build.sh"]
-RUN /tmp/build.sh
+COPY install.sh /tmp/install.sh
+RUN ["chmod", "+x", "/tmp/install.sh"]
+RUN /tmp/install.sh
+
+COPY config.sh /tmp/config.sh
+RUN ["chmod", "+x", "/tmp/config.sh"]
+RUN /tmp/config.sh
+
+COPY config.sh /tmp/cleanup.sh
+RUN ["chmod", "+x", "/tmp/cleanup.sh"]
+RUN /tmp/cleanup.sh
 
 ENV LD_PRELOAD /opt/td-agent/embedded/lib/libjemalloc.so
 
