@@ -38,6 +38,9 @@ defaultAgentOptions:
     retryWait: 1s
     retryExponentialBackoffBase: 2
     disableChunkBackup: true
+    chunkLimitSize: 2MB
+  tail:
+    readBytesLimitPerSecond: 8192
 
 useCRIFormat: false
 

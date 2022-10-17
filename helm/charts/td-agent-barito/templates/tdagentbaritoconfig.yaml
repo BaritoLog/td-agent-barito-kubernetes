@@ -22,6 +22,7 @@ data:
         {{- end }}
       </parse>
       read_from_head true
+      read_bytes_limit_per_second {{ $.Values.defaultAgentOptions.tail.readBytesLimitPerSecond }}
     </source>
 
     <filter kubernetes.**>
@@ -64,6 +65,7 @@ data:
         retry_wait {{ $.Values.defaultAgentOptions.buffer.retryWait }}
         retry_exponential_backoff_base {{ $.Values.defaultAgentOptions.buffer.retryExponentialBackoffBase }}
         disable_chunk_backup {{ $.Values.defaultAgentOptions.buffer.disableChunkBackup }}
+        chunk_limit_size  {{ $.Values.defaultAgentOptions.buffer.chunkLimitSize }}
         {{- range .bufferOptions }}
         {{ . }}
         {{- end }}
