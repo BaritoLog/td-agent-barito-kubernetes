@@ -30,24 +30,9 @@ data:
     </filter>
 
     {{- range .Values.apps }}
-    {{- $exclusion := "" -}}
-    {{- if .containerExclusions }}
-    {{- $exclusion = printf "{%s}" (join "," .containerExclusions) -}}
-    {{- end }}
-
     {{- if .namespace }}
-    {{- if .containerExclusions }}
-    <match kubernetes.var.log.containers.{{ .name }}-**_{{ .namespace }}_{{ $exclusion }}**.log>
-      @type null
-    </match>
-    {{- end }}
     <match kubernetes.var.log.containers.{{ .name }}-**_{{ .namespace }}_**.log>
     {{- else }}
-    {{- if .containerExclusions }}
-    <match kubernetes.var.log.containers.{{ .name }}-**_**_{{ $exclusion }}**.log>
-      @type null
-    </match>
-    {{- end }}
     <match kubernetes.var.log.containers.{{ .name }}-**.log>
     {{- end }}
       @type barito_batch_k8s
