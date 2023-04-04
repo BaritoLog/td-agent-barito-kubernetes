@@ -39,22 +39,29 @@ data:
     {{- end }}
 
     {{- $app := . -}}
-    {{- range (list "{istio}**" "**") }}
-    <match {{ $fmt }}{{ . }}.log>
-        @type barito_batch_k8s
-        name {{ $app.name }}
-        cluster_name {{ $.Values.cluster_name }}
-        application_name {{ $app.baritoAppName }}
-        {{- if $app.applicationGroupSecret }}
-        application_group_secret {{ $app.applicationGroupSecret }}
-        {{- else }}
-        application_group_secret {{ $.Values.defaultAppOptions.applicationGroupSecret }}
-        {{- end }}
-        {{- if $app.produceUrl }}
-        produce_url {{ $app.produceUrl }}
-        {{- else }}
-        produce_url {{ $.Values.defaultAppOptions.produceUrl }}
-        {{- end }}
+    {{- range (append $.Values.separatedSidecars "**") }}
+
+    {{- $isSeparatedSidecar := ne . "**" -}}
+    {{- $match := printf "%s**.log" $fmt -}}
+    {{- if $isSeparatedSidecar }}
+    {{- $match = printf "%s{%s}**.log" $fmt . }}
+    {{- end }}
+
+    <match {{ $match }}>
+      @type barito_batch_k8s
+      name {{ $app.name }}
+      cluster_name {{ $.Values.cluster_name }}
+      application_name {{ ternary . $app.baritoAppName $isSeparatedSidecar }}
+      {{- if $app.applicationGroupSecret }}
+      application_group_secret {{ $app.applicationGroupSecret }}
+      {{- else }}
+      application_group_secret {{ $.Values.defaultAppOptions.applicationGroupSecret }}
+      {{- end }}
+      {{- if $app.produceUrl }}
+      produce_url {{ $app.produceUrl }}
+      {{- else }}
+      produce_url {{ $.Values.defaultAppOptions.produceUrl }}
+      {{- end }}
       <buffer>
         flush_at_shutdown {{ $.Values.defaultAgentOptions.buffer.flushAtShutdown }}
         flush_thread_count {{ $.Values.defaultAgentOptions.buffer.flushThreadCount }}
