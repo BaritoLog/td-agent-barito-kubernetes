@@ -78,3 +78,6 @@ extraVolumeMounts: []
   #   - name: ssl-certs
   #     mountPath: /etc/ssl/certs/ca-certificates.crt
   #     readOnly: true
+
+# these sidecars logs will be stored in the new application name
+separatedSidecars: []
