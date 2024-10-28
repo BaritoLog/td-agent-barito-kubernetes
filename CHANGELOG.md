@@ -1,20 +1,29 @@
 # Changelog
 
+**0.3.0**
+
+- add `additionalLabels` parameters
+
 **0.2.26**
+
 - treat `postMatchConfig` as string rather than array
 
 **0.2.25**
+
 - add `preMatchConfig`
 - change `extraConfig` into `postMatchConfig`
 
 **0.2.24**
+
 - add priorityClassName parameters
 - expose prometheus port and configure livenessProbe
 
 **0.2.23**
+
 - update image tag override & bump default image tag
 
 **0.2.22**
+
 - add extraVolumes & extraVolumeMounts parameters
 
 **0.2.18**

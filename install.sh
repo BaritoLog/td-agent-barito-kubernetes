@@ -1,6 +1,7 @@
 #!/bin/bash -ex
 
 apt-get update
+apt-get install -y apt-transport-https
 apt-get install -y -q --no-install-recommends \
   curl ca-certificates make g++ sudo bash
 
