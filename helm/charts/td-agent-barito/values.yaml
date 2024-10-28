@@ -6,6 +6,8 @@ tolerations: []
 nodeSelector: {}
 affinity: {}
 
+additionalLabels: {}
+
 rbac:
   ## If true, create and use RBAC resources
   create: false
