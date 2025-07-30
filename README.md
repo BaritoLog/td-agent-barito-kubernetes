@@ -2,23 +2,43 @@
 
 This repository contains the source files needed to make a Docker image that collects Docker container log files using [td-agent](http://www.fluentd.org/) and sends them to [Barito](https://github.com/BaritoLog/).
 
-This image is designed to be used as a [daemonset](http://kubernetes.io/docs/admin/daemons) in a [Kubernetes](https://github.com/kubernetes/kubernetes) cluster. Every new version will be pushed to [Barito Docker Hub](https://hub.docker.com/r/barito/td-agent-barito-kubernetes/)
+## Overview
 
-Because there are additional configurations that have to be made, this image full functionality can only be realized when you install it using our [helm chart](https://github.com/BaritoLog/helm-charts).
+This Docker image is designed to be deployed as a [DaemonSet](http://kubernetes.io/docs/admin/daemons) in a [Kubernetes](https://github.com/kubernetes/kubernetes) cluster. It automatically collects logs from all containers in the cluster and forwards them to your Barito logging infrastructure.
 
-## Usage
+### Features
 
-Sign in to BaritoMarket and find your Application Group. Barito `Application Group Secret` and `Produce URL` will be displayed, make note of those details.
+- **Kubernetes Native**: Designed specifically for Kubernetes deployments
+- **Auto-discovery**: Automatically detects and collects logs from all pods
+- **Flexible Configuration**: Support for per-application custom settings
+- **Resource Management**: Configurable CPU, memory, and storage limits
+- **Client Trail Support**: Add custom metadata to logs for better filtering
+- **CRI-O Compatible**: Support for both Docker and CRI-O container runtimes
 
-### Install Helm Chart
+### Docker Images
 
-1. Add our helm chart repo
+Every new version is automatically pushed to [Barito Docker Hub](https://hub.docker.com/r/barito/td-agent-barito-kubernetes/).
+
+## Prerequisites
+
+- Kubernetes cluster
+- Helm 3.x
+- Barito Market account with:
+  - Application Group Secret
+  - Produce URL
+
+## Installation
+
+### 1. Add Helm Repository
 
 ```shell
 helm repo add barito https://baritolog.github.io/helm-charts
+helm repo update
 ```
 
-2. Create a custom yaml containing helm chart values to specify app that you want its logs to be forwarded, example:
+### 2. Configure Your Applications
+
+Create a custom YAML file containing helm chart values to specify applications for log forwarding:
 
 ```yaml
 # myApps.yaml
@@ -37,66 +57,119 @@ apps:
     produceUrl: https://barito-router.other-domain.com/produce_batch
 ```
 
-> `name` is metadata name of your deployment
+**Configuration Notes:**
 
-3. Install using helm
+- `name`: Metadata name of your deployment
+- `baritoAppName`: Display name in Barito
+- Individual apps can override default settings
+
+### 3. Install with Helm
 
 ```shell
-helm install barito/td-agent-barito --name=td-agent-barito --values=myApps.yaml
+helm install td-agent-barito barito/td-agent-barito --values=myApps.yaml
 ```
 
-Override `rbac.create` when installing: `--set rbac.create=true` if you are using RBAC authorization.
+For RBAC-enabled clusters:
 
-## Notes
+```shell
+helm install td-agent-barito barito/td-agent-barito --values=myApps.yaml --set rbac.create=true
+```
 
-If not specified,
+## Configuration Options
 
-- DaemonSet will have memory limits of `2 Gi` and memory requests `1 Gi`. Use `--set resources.limits.memory=XX` or `--set resources.requests.memory=XX` to override.
+### Resource Limits
 
-- DaemonSet will have cpu limits of `2` and cpu requests `500m`. Use `--set resources.limits.cpu=XX` or `--set resources.requests.cpu=XX` to override.
+The DaemonSet uses the following default resource settings:
 
-- DaemonSet will have ephemeral-storage limits of `6 Gi` and ephemeral-storage requests `4 Gi`. Use `--set resources.limits.ephemeral-storage=XX` or `--set resources.requests.ephemeral-storage=XX` to override.
+- **Memory**: 1 Gi requests, 2 Gi limits
+- **CPU**: 500m requests, 2 limits  
+- **Ephemeral Storage**: 4 Gi requests, 6 Gi limits
 
-- td-agent will has config `parse @type none` by default. Use `--set useCRIFormat=true` if the cluster use CRI-o Format.
+Override these settings:
 
-#### Adding Client Trail Information to Logs
+```shell
+# Memory
+--set resources.limits.memory=4Gi
+--set resources.requests.memory=2Gi
 
-##### Overview
+# CPU
+--set resources.limits.cpu=4
+--set resources.requests.cpu=1
 
-This release introduces client trail information to logs by allowing the addition of custom labels through the additionaLabels field in your configuration. These labels will appear as part of the log metadata under the `client_trail` section, making it easier to filter and analyze logs in Kibana.
+# Ephemeral Storage
+--set resources.limits.ephemeral-storage=8Gi
+--set resources.requests.ephemeral-storage=6Gi
+```
 
-##### How to Use
+### Container Runtime
 
-In your configuration, add the additionaLabels field with key-value pairs in hash form under your values.yml. For example:
+- **Default**: Docker format (`parse @type none`)
+- **CRI-O**: Use `--set useCRIFormat=true` for CRI-O clusters
+
+### Client Trail Information
+
+Add custom metadata to logs for better filtering and analysis:
 
 ```yaml
+# In your values.yaml
 additionalLabels:
   env: "staging"
   cloud_service_provider: "gcp"
+  region: "us-west-2"
 ```
 
-##### Example Log Output
-
-With the above configuration, your logs will contain additional metadata like this:
+This will add metadata to your logs:
 
 ```json
 {
   "message": "Sample log message",
   "client_trail": {
     "env": "staging",
-    "cloud_service_provider": "gcp"
+    "cloud_service_provider": "gcp",
+    "region": "us-west-2"
   }
 }
 ```
 
-This enables you to filter logs on Kibana easily using:
+**Use Cases:**
 
-```makefile
-client_trail.env: staging
-client_trail.cloud_service_provider: gcp
+- Environment-based filtering: `client_trail.env: staging`
+- Service identification: `client_trail.service_name: api-gateway`
+- Regional analysis: `client_trail.region: us-west-2`
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Pods not starting**: Check resource limits and cluster capacity
+2. **No logs appearing**: Verify Application Group Secret and Produce URL
+3. **Permission denied**: Ensure RBAC is properly configured
+
+### Debug Commands
+
+```shell
+# Check DaemonSet status
+kubectl get daemonset td-agent-barito
+
+# View pod logs
+kubectl logs -l app=td-agent-barito
+
+# Check configuration
+kubectl describe configmap td-agent-barito-config
 ```
 
-##### Use Cases
+## Development
 
-Environment-based filtering: Easily distinguish logs from staging, production, or development environments.
-Dynamic labels: Add any other relevant information (e.g., service_name, region) for better log categorization.
+For development and customization of this image, please see the source repository structure and build instructions in the project's development documentation.
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+
+This project is licensed under the same terms as the Barito project.
